@@ -1,5 +1,11 @@
 import java.io.File
 
+enum class MenuOption(val value: Int) {
+    EXIT(0),
+    LEARN_WORDS(1),
+    STATISTICS(2)
+}
+
 data class Word(
     val original: String,
     val translate: String,
@@ -13,26 +19,26 @@ fun main() {
         println(
             """
             Меню: 
-            1 – Учить слова
-            2 – Статистика
-            0 – Выход
+            ${MenuOption.LEARN_WORDS.value} – Учить слова
+            ${MenuOption.STATISTICS.value} – Статистика
+            ${MenuOption.EXIT.value} – Выход
         """.trimIndent()
         )
 
         print("Ввод: ")
-        val input = readln()
+        val input: Int? = readln().toIntOrNull()
         println()
         when (input) {
-            "0" -> break
-            "1" -> println("Учить слова")
-            "2" -> println("Статистика")
+            MenuOption.EXIT.value -> break
+            MenuOption.LEARN_WORDS.value -> println("Учить слова")
+            MenuOption.STATISTICS.value -> println("Статистика")
             else -> println("Введите число 1, 2 или 0")
         }
     }
 
 }
 
-fun loadDictionary(): MutableList<Word> {
+fun loadDictionary(): List<Word> {
     val dictionary = mutableListOf<Word>()
 
     val wordsFile = File("words.txt")
