@@ -1,4 +1,5 @@
 import java.io.File
+import kotlin.math.roundToInt
 
 enum class MenuOption(val value: Int) {
     EXIT(0),
@@ -31,7 +32,10 @@ fun main() {
         when (input) {
             MenuOption.EXIT.value -> break
             MenuOption.LEARN_WORDS.value -> println("Учить слова")
-            MenuOption.STATISTICS.value -> println("Статистика")
+            MenuOption.STATISTICS.value -> {
+                println("Статистика")
+                showStatistics(dictionary)
+            }
             else -> println("Введите число 1, 2 или 0")
         }
     }
@@ -43,8 +47,8 @@ fun loadDictionary(): List<Word> {
 
     val wordsFile = File("words.txt")
     wordsFile.createNewFile()
-    wordsFile.writeText("hello|привет|0\n")
-    wordsFile.appendText("dog|собака|0\n")
+    wordsFile.writeText("hello|привет|3\n")
+    wordsFile.appendText("dog|собака|2\n")
     wordsFile.appendText("cat|кошка\n")
 
     wordsFile.readLines().forEach {
@@ -59,4 +63,12 @@ fun loadDictionary(): List<Word> {
     }
 
     return dictionary
+}
+
+fun showStatistics(dictionary: List<Word>) {
+    val wordsAmount = dictionary.size
+    val learnedWordsAmount = dictionary.filter { it.correctAnswerCount.toInt() >= 3 }.size
+    val learnedWordsPercentage = (learnedWordsAmount.toDouble() / wordsAmount.toDouble()) * 100
+
+    println("Выучено $learnedWordsAmount из $wordsAmount | ${learnedWordsPercentage.roundToInt()}%")
 }
