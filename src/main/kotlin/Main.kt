@@ -7,6 +7,8 @@ enum class MenuOption(val value: Int) {
     STATISTICS(2)
 }
 
+const val REQUIRED_LEARNED_WORDS = 3
+
 data class Word(
     val original: String,
     val translate: String,
@@ -36,6 +38,7 @@ fun main() {
                 println("Статистика")
                 showStatistics(dictionary)
             }
+
             else -> println("Введите число 1, 2 или 0")
         }
     }
@@ -44,12 +47,11 @@ fun main() {
 
 fun loadDictionary(): List<Word> {
     val dictionary = mutableListOf<Word>()
-
     val wordsFile = File("words.txt")
-    wordsFile.createNewFile()
-    wordsFile.writeText("hello|привет|3\n")
-    wordsFile.appendText("dog|собака|2\n")
-    wordsFile.appendText("cat|кошка\n")
+
+    if (!wordsFile.exists()) {
+        fillDictionaryFile(wordsFile)
+    }
 
     wordsFile.readLines().forEach {
         val line = it.split("|")
@@ -66,9 +68,22 @@ fun loadDictionary(): List<Word> {
 }
 
 fun showStatistics(dictionary: List<Word>) {
-    val wordsAmount = dictionary.size
-    val learnedWordsAmount = dictionary.filter { it.correctAnswerCount.toInt() >= 3 }.size
-    val learnedWordsPercentage = (learnedWordsAmount.toDouble() / wordsAmount.toDouble()) * 100
+    if (dictionary.isEmpty()) {
+        println("Словарь пуст")
+    } else {
+        val wordsAmount = dictionary.size
+        val learnedWordsAmount = dictionary.filter {
+            it.correctAnswerCount.toInt() >= REQUIRED_LEARNED_WORDS
+        }.size
+        val learnedWordsPercentage = (learnedWordsAmount.toDouble() / wordsAmount.toDouble()) * 100
 
-    println("Выучено $learnedWordsAmount из $wordsAmount | ${learnedWordsPercentage.roundToInt()}%")
+        println("Выучено $learnedWordsAmount из $wordsAmount | ${learnedWordsPercentage.roundToInt()}%")
+    }
+}
+
+fun fillDictionaryFile(wordsFile: File) {
+    wordsFile.createNewFile()
+    wordsFile.writeText("hello|привет|3\n")
+    wordsFile.appendText("dog|собака|2\n")
+    wordsFile.appendText("cat|кошка\n")
 }
