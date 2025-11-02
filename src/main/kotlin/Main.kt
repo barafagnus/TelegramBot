@@ -1,10 +1,13 @@
 import java.io.File
+import kotlin.math.roundToInt
 
 enum class MenuOption(val value: Int) {
     EXIT(0),
     LEARN_WORDS(1),
     STATISTICS(2)
 }
+
+const val REQUIRED_LEARNED_WORDS = 3
 
 data class Word(
     val original: String,
@@ -31,7 +34,11 @@ fun main() {
         when (input) {
             MenuOption.EXIT.value -> break
             MenuOption.LEARN_WORDS.value -> println("Учить слова")
-            MenuOption.STATISTICS.value -> println("Статистика")
+            MenuOption.STATISTICS.value -> {
+                println("Статистика")
+                showStatistics(dictionary)
+            }
+
             else -> println("Введите число 1, 2 или 0")
         }
     }
@@ -40,12 +47,11 @@ fun main() {
 
 fun loadDictionary(): List<Word> {
     val dictionary = mutableListOf<Word>()
-
     val wordsFile = File("words.txt")
-    wordsFile.createNewFile()
-    wordsFile.writeText("hello|привет|0\n")
-    wordsFile.appendText("dog|собака|0\n")
-    wordsFile.appendText("cat|кошка\n")
+
+    if (!wordsFile.exists()) {
+        fillDictionaryFile(wordsFile)
+    }
 
     wordsFile.readLines().forEach {
         val line = it.split("|")
@@ -59,4 +65,25 @@ fun loadDictionary(): List<Word> {
     }
 
     return dictionary
+}
+
+fun showStatistics(dictionary: List<Word>) {
+    if (dictionary.isEmpty()) {
+        println("Словарь пуст")
+    } else {
+        val wordsAmount = dictionary.size
+        val learnedWordsAmount = dictionary.filter {
+            it.correctAnswerCount.toInt() >= REQUIRED_LEARNED_WORDS
+        }.size
+        val learnedWordsPercentage = (learnedWordsAmount.toDouble() / wordsAmount.toDouble()) * 100
+
+        println("Выучено $learnedWordsAmount из $wordsAmount | ${learnedWordsPercentage.roundToInt()}%")
+    }
+}
+
+fun fillDictionaryFile(wordsFile: File) {
+    wordsFile.createNewFile()
+    wordsFile.writeText("hello|привет|3\n")
+    wordsFile.appendText("dog|собака|2\n")
+    wordsFile.appendText("cat|кошка\n")
 }
