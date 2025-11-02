@@ -8,6 +8,7 @@ enum class MenuOption(val value: Int) {
 }
 
 const val REQUIRED_LEARNED_WORDS = 3
+const val NUMBER_OF_UNLEARNED_WORDS = 4
 
 data class Word(
     val original: String,
@@ -33,7 +34,11 @@ fun main() {
         println()
         when (input) {
             MenuOption.EXIT.value -> break
-            MenuOption.LEARN_WORDS.value -> println("Учить слова")
+            MenuOption.LEARN_WORDS.value -> {
+                println("Учить слова")
+                learnWords(dictionary)
+            }
+
             MenuOption.STATISTICS.value -> {
                 println("Статистика")
                 showStatistics(dictionary)
@@ -81,9 +86,33 @@ fun showStatistics(dictionary: List<Word>) {
     }
 }
 
+fun learnWords(dictionary: List<Word>) {
+    while (true) {
+        val notLearnedList = dictionary.filter { it.correctAnswerCount.toInt() <= 2 }
+
+        if (notLearnedList.isEmpty()) {
+            println("Все слова в словаре выучены")
+            break
+        } else {
+            val questionWords = notLearnedList.take(NUMBER_OF_UNLEARNED_WORDS).shuffled()
+            val correctAnswer = questionWords.random().original
+
+            println()
+            println("$correctAnswer:")
+            questionWords.forEachIndexed { index, word ->
+                println(" ${index + 1} - ${word.translate}")
+            }
+
+            print("Ввод: ")
+            val input = readln().toIntOrNull()
+        }
+    }
+}
+
 fun fillDictionaryFile(wordsFile: File) {
     wordsFile.createNewFile()
-    wordsFile.writeText("hello|привет|3\n")
+    wordsFile.writeText("thank you|спасибо|1\n")
     wordsFile.appendText("dog|собака|2\n")
-    wordsFile.appendText("cat|кошка\n")
+    wordsFile.appendText("cat|кошка|1\n")
+    wordsFile.appendText("hat|шляпа\n")
 }
