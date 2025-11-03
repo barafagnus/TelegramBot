@@ -88,13 +88,13 @@ fun showStatistics(dictionary: List<Word>) {
 
 fun learnWords(dictionary: List<Word>) {
     while (true) {
-        val notLearnedList = dictionary.filter { it.correctAnswerCount.toInt() <= 2 }
+        val notLearnedList = dictionary.filter { it.correctAnswerCount.toInt() < REQUIRED_LEARNED_WORDS }
 
         if (notLearnedList.isEmpty()) {
             println("Все слова в словаре выучены")
             break
         } else {
-            val questionWords = notLearnedList.take(NUMBER_OF_UNLEARNED_WORDS).shuffled()
+            val questionWords = notLearnedList.shuffled().take(NUMBER_OF_UNLEARNED_WORDS)
             val correctAnswer = questionWords.random().original
 
             println()
