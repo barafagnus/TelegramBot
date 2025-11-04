@@ -95,10 +95,10 @@ fun learnWords(dictionary: List<Word>) {
             break
         } else {
             val questionWords = notLearnedList.shuffled().take(NUMBER_OF_UNLEARNED_WORDS)
-            val correctAnswer = questionWords.random().original
+            val correctAnswer = questionWords.random()
 
             println()
-            println("$correctAnswer:")
+            println("${correctAnswer.original}:")
             questionWords.forEachIndexed { index, word ->
                 println(" ${index + 1} - ${word.translate}")
             }
