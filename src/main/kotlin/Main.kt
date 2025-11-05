@@ -14,7 +14,7 @@ const val FILE_PATHNAME = "words.txt"
 data class Word(
     val original: String,
     val translate: String,
-    var correctAnswerCount: String = "0"
+    var correctAnswerCount: Int = 0
 )
 
 fun main() {
@@ -65,7 +65,7 @@ fun loadDictionary(): List<Word> {
             Word(
                 original = line[0],
                 translate = line[1],
-                correctAnswerCount = line.getOrNull(2) ?: "0"
+                correctAnswerCount = line.getOrNull(2)?.toInt() ?: 0
             )
         )
     }
@@ -79,7 +79,7 @@ fun showStatistics(dictionary: List<Word>) {
     } else {
         val wordsAmount = dictionary.size
         val learnedWordsAmount = dictionary.filter {
-            it.correctAnswerCount.toInt() >= REQUIRED_LEARNED_WORDS
+            it.correctAnswerCount >= REQUIRED_LEARNED_WORDS
         }.size
         val learnedWordsPercentage = (learnedWordsAmount.toDouble() / wordsAmount.toDouble()) * 100
 
@@ -89,7 +89,7 @@ fun showStatistics(dictionary: List<Word>) {
 
 fun learnWords(dictionary: List<Word>) {
     while (true) {
-        val notLearnedList = dictionary.filter { it.correctAnswerCount.toInt() < REQUIRED_LEARNED_WORDS }
+        val notLearnedList = dictionary.filter { it.correctAnswerCount < REQUIRED_LEARNED_WORDS }
 
         if (notLearnedList.isEmpty()) {
             println("Все слова в словаре выучены")
@@ -116,8 +116,7 @@ fun learnWords(dictionary: List<Word>) {
                     if (userAnswerInput == correctAnswerId) {
                         println("Правильно!")
                         val answerIndex = dictionary.indexOf(correctAnswer)
-                        dictionary[answerIndex].correctAnswerCount =
-                            (correctAnswer.correctAnswerCount.toInt() + 1).toString()
+                        correctAnswer.correctAnswerCount += 1
                         saveDictionary(dictionary)
                     } else println("Неправильно! ${correctAnswer.original} - это ${correctAnswer.translate}")
                 }
