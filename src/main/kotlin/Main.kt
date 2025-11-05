@@ -121,7 +121,7 @@ fun learnWords(dictionary: List<Word>) {
                         saveDictionary(dictionary)
                     } else println("Неправильно! ${correctAnswer.original} - это ${correctAnswer.translate}")
                 }
-                0 -> break
+                MenuOption.EXIT.value -> break
                 else -> println("Некорректный ввод. Введите число от 0 до ${questionWords.size}")
             }
         }
