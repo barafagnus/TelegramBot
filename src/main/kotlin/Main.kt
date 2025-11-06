@@ -9,11 +9,12 @@ enum class MenuOption(val value: Int) {
 
 const val REQUIRED_LEARNED_WORDS = 3
 const val NUMBER_OF_UNLEARNED_WORDS = 4
+const val FILE_PATHNAME = "words.txt"
 
 data class Word(
     val original: String,
     val translate: String,
-    val correctAnswerCount: String = "0"
+    var correctAnswerCount: Int = 0
 )
 
 fun main() {
@@ -52,7 +53,7 @@ fun main() {
 
 fun loadDictionary(): List<Word> {
     val dictionary = mutableListOf<Word>()
-    val wordsFile = File("words.txt")
+    val wordsFile = File(FILE_PATHNAME)
 
     if (!wordsFile.exists()) {
         fillDictionaryFile(wordsFile)
@@ -64,7 +65,7 @@ fun loadDictionary(): List<Word> {
             Word(
                 original = line[0],
                 translate = line[1],
-                correctAnswerCount = line.getOrNull(2) ?: "0"
+                correctAnswerCount = line.getOrNull(2)?.toInt() ?: 0
             )
         )
     }
@@ -78,7 +79,7 @@ fun showStatistics(dictionary: List<Word>) {
     } else {
         val wordsAmount = dictionary.size
         val learnedWordsAmount = dictionary.filter {
-            it.correctAnswerCount.toInt() >= REQUIRED_LEARNED_WORDS
+            it.correctAnswerCount >= REQUIRED_LEARNED_WORDS
         }.size
         val learnedWordsPercentage = (learnedWordsAmount.toDouble() / wordsAmount.toDouble()) * 100
 
@@ -88,7 +89,7 @@ fun showStatistics(dictionary: List<Word>) {
 
 fun learnWords(dictionary: List<Word>) {
     while (true) {
-        val notLearnedList = dictionary.filter { it.correctAnswerCount.toInt() < REQUIRED_LEARNED_WORDS }
+        val notLearnedList = dictionary.filter { it.correctAnswerCount < REQUIRED_LEARNED_WORDS }
 
         if (notLearnedList.isEmpty()) {
             println("Все слова в словаре выучены")
@@ -102,10 +103,35 @@ fun learnWords(dictionary: List<Word>) {
             questionWords.forEachIndexed { index, word ->
                 println(" ${index + 1} - ${word.translate}")
             }
+            println("--------")
+            println(" ${MenuOption.EXIT.value} - Меню")
+
 
             print("Ввод: ")
-            val input = readln().toIntOrNull()
+            val userAnswerInput = readln().toIntOrNull()
+            val correctAnswerId = questionWords.indexOf(correctAnswer) + 1
+
+            when (userAnswerInput) {
+                in 1..questionWords.size -> {
+                    if (userAnswerInput == correctAnswerId) {
+                        println("Правильно!")
+                        val answerIndex = dictionary.indexOf(correctAnswer)
+                        correctAnswer.correctAnswerCount += 1
+                        saveDictionary(dictionary)
+                    } else println("Неправильно! ${correctAnswer.original} - это ${correctAnswer.translate}")
+                }
+                MenuOption.EXIT.value -> break
+                else -> println("Некорректный ввод. Введите число от 0 до ${questionWords.size}")
+            }
         }
+    }
+}
+
+fun saveDictionary(dictionary: List<Word>) {
+    val wordsFile = File(FILE_PATHNAME)
+    wordsFile.writeText("")
+    dictionary.forEach {
+        wordsFile.appendText("${it.original}|${it.translate}|${it.correctAnswerCount}\n")
     }
 }
 
