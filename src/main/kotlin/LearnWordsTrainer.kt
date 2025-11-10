@@ -22,7 +22,7 @@ class LearnWordsTrainer(
     fun getStatistics(): Statistics {
         val learned = dictionary.filter { it.correctAnswerCount >= learnedAnswerCount }.size
         val total = dictionary.size
-        val percent = (learned.toDouble() / total.toDouble()) * 100
+        val percent = if (total > 0) (learned.toDouble() / total.toDouble()) * 100 else 0.0
         return Statistics(learned, total, percent)
     }
 
@@ -75,7 +75,7 @@ class LearnWordsTrainer(
                 )
             }
             return dictionary
-        } catch (e: IndexOutOfBoundsException) {
+        } catch (e: Exception) {
             throw IllegalStateException("Некорректный файл")
         }
     }
@@ -98,5 +98,3 @@ class LearnWordsTrainer(
     }
 
 }
-
-
