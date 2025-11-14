@@ -6,8 +6,6 @@ enum class MenuOption(val value: Int) {
     STATISTICS(2)
 }
 
-const val REQUIRED_LEARNED_WORDS = 3
-const val NUMBER_OF_UNLEARNED_WORDS = 4
 const val FILE_PATHNAME = "words.txt"
 
 data class Word(
@@ -24,7 +22,12 @@ fun Question.asConsoleString(): String {
 }
 
 fun main() {
-    val trainer = LearnWordsTrainer()
+    val trainer = try {
+        LearnWordsTrainer(3, 4)
+    } catch (e: Exception) {
+        println("Невозможно загрузить словарь")
+        return
+    }
 
     while (true) {
         println(
