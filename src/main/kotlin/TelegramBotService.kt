@@ -9,9 +9,13 @@ data class Update(
     val text: String?,
 )
 
-class TelegramBotService {
-    fun getUpdates(botToken: String, updateId: Int?): String {
-        val urlGetUpdates = "https://api.telegram.org/bot$botToken/getUpdates?offset=$updateId"
+class TelegramBotService(
+    private val botToken: String
+) {
+    private val url = "https://api.telegram.org/bot$botToken"
+
+    fun getUpdates(updateId: Int?): String {
+        val urlGetUpdates = "$url/getUpdates?offset=$updateId"
         val client: HttpClient = HttpClient.newBuilder().build()
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
         val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
@@ -25,8 +29,8 @@ class TelegramBotService {
             text = "\"text\":\"(.+?)\"".toRegex().find(updatesJson)?.groups?.get(1)?.value,
         )
 
-    fun sendMessage(botToken: String, chatId: Int?, text: String) {
-        val urlSendMessage = "https://api.telegram.org/bot$botToken/sendMessage?chat_id=$chatId&text=${
+    fun sendMessage(chatId: Int?, text: String) {
+        val urlSendMessage = "$url/sendMessage?chat_id=$chatId&text=${
             text.replace(" ", "+")
         }"
         val client: HttpClient = HttpClient.newBuilder().build()

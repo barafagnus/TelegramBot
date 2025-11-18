@@ -1,11 +1,10 @@
 fun main(args: Array<String>) {
-    val botToken = args[0]
     var updateId: Int? = 0
-    val telegramBotService = TelegramBotService()
+    val telegramBotService = TelegramBotService(args[0])
 
     while (true) {
         Thread.sleep(2000)
-        val updatesJson: String = telegramBotService.getUpdates(botToken, updateId)
+        val updatesJson: String = telegramBotService.getUpdates(updateId)
         val updates = telegramBotService.parseUpdates(updatesJson)
         val startUpdateId = updates.updateId
         if (startUpdateId == null) continue
@@ -15,10 +14,9 @@ fun main(args: Array<String>) {
                 "hello" -> "Hello"
                 else -> "I don't undarstand u"
             }
-            telegramBotService.sendMessage(botToken, updates.chatId, message)
+            telegramBotService.sendMessage(updates.chatId, message)
         }
 
         updateId = startUpdateId.plus(1)
     }
 }
-
