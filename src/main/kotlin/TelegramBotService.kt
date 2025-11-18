@@ -10,7 +10,7 @@ data class Update(
 )
 
 class TelegramBotService(
-    private val botToken: String
+    botToken: String
 ) {
     private val url = "https://api.telegram.org/bot$botToken"
 
